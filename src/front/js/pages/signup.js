@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-
+import { Link } from "react-router-dom";
 
 export const Signup = () => {
   const [email, setEmail] = useState("");
@@ -9,9 +8,10 @@ export const Signup = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const navigate = useNavigate();
 
   const handleSignup = async (e) => {
+    console.log("Backend URL:", process.env.BACKEND_URL);
+
     e.preventDefault();
     setError("");
     setSuccess("");
@@ -22,11 +22,14 @@ export const Signup = () => {
     }
 
     try {
-      const response = await fetch(`${process.env.BACKEND_URL}/api/signup`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, username, password }),
-      });
+      const response = await fetch(
+        `${process.env.BACKEND_URL}/api/signup`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, username, password }),
+        }
+      );
 
       if (!response.ok) {
         const data = await response.json();
@@ -35,7 +38,7 @@ export const Signup = () => {
       }
 
       setSuccess("Signup successful! Please login.");
-      setTimeout(() => navigate("/login"), 2000);
+      setTimeout(() => (window.location.href = "/login"), 2000);
     } catch (error) {
       console.error("Error:", error);
       setError("An error occurred. Please try again.");
@@ -49,52 +52,52 @@ export const Signup = () => {
       {success && <div className="alert alert-success">{success}</div>}
       <form onSubmit={handleSignup}>
         <div className="mb-3">
-          <label htmlFor="emailInput" className="form-label">
+          <label htmlFor="emailInputSignup" className="form-label">
             Email address
           </label>
           <input
             type="email"
             className="form-control"
-            id="emailInput"
+            id="emailInputSignup"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
           />
         </div>
         <div className="mb-3">
-          <label htmlFor="usernameInput" className="form-label">
+          <label htmlFor="usernameInputSignup" className="form-label">
             Username
           </label>
           <input
             type="text"
             className="form-control"
-            id="usernameInput"
+            id="usernameInputSignup"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
           />
         </div>
         <div className="mb-3">
-          <label htmlFor="passwordInput" className="form-label">
+          <label htmlFor="passwordInputSignup" className="form-label">
             Password
           </label>
           <input
             type="password"
             className="form-control"
-            id="passwordInput"
+            id="passwordInputSignup"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
         </div>
         <div className="mb-3">
-          <label htmlFor="confirmPasswordInput" className="form-label">
+          <label htmlFor="confirmPasswordInputSignup" className="form-label">
             Confirm Password
           </label>
           <input
             type="password"
             className="form-control"
-            id="confirmPasswordInput"
+            id="confirmPasswordInputSignup"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
@@ -105,7 +108,7 @@ export const Signup = () => {
         </button>
       </form>
       <div className="text-center mt-2">
-        <Link to="/">Back to main page</Link>
+        <Link to="/login">Back to Login</Link>
       </div>
     </div>
   );

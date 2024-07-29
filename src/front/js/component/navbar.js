@@ -13,7 +13,7 @@ export const Navbar = () => {
     <nav className="navbar navbar-light bg-light">
       <div className="container">
         <Link to="/">
-          <span className="navbar-brand mb-0 h1">Authentication JWT Flask and React Project</span>
+          <span className="navbar-brand mb-0 h1">React Boilerplate</span>
         </Link>
         <div className="ml-auto">
           <Link to="/private">
@@ -27,14 +27,18 @@ export const Navbar = () => {
               className="btn btn-secondary dropdown-toggle"
               type="button"
               id="dropdownMenuButton"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
+              aria-expanded={showDropdown ? "true" : "false"}
               style={{ width: "200px" }}
               onClick={() => setShowDropdown(!showDropdown)}
             >
               Login
             </button>
-            {showDropdown && <Login onLoginSuccess={handleLoginSuccess} />}
+            <div
+              className={`dropdown-menu ${showDropdown ? "show" : ""}`}
+              aria-labelledby="dropdownMenuButton"
+            >
+              <Login onLoginSuccess={handleLoginSuccess} />
+            </div>
           </div>
         </div>
       </div>

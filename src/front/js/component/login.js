@@ -35,11 +35,7 @@ export const Login = ({ onLoginSuccess }) => {
   };
 
   return (
-    <div
-      className="dropdown-menu p-4"
-      aria-labelledby="dropdownMenuButton"
-      style={{ width: "500px" }}
-    >
+    <div className="p-4" style={{ width: "500px" }}>
       <form onSubmit={handleLogin}>
         <div className="mb-3">
           <label htmlFor="emailInput" className="form-label">

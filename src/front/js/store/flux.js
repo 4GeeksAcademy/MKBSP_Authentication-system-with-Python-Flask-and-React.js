@@ -29,12 +29,18 @@ const getState = ({ getStore, getActions, setStore }) => {
       },
       getMessage: async () => {
         try {
-          const resp = await fetch(process.env.BACKEND_URL + "/api/hello");
+          const resp = await fetch(
+            process.env.REACT_APP_BACKEND_URL + "/api/hello"
+          );
+          if (!resp.ok) {
+            throw new Error("Network response was not ok.");
+          }
           const data = await resp.json();
           setStore({ message: data.message });
           return data;
         } catch (error) {
           console.log("Error loading message from backend", error);
+          return null; // or throw error if you want to propagate it
         }
       },
       changeColor: (index, color) => {
@@ -44,6 +50,32 @@ const getState = ({ getStore, getActions, setStore }) => {
           return elm;
         });
         setStore({ demo: demo });
+      },
+      signup: async (email, username, password) => {
+        try {
+          const response = await fetch(
+            `${process.env.REACT_APP_BACKEND_URL}/api/signup`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email, username, password }),
+            }
+          );
+
+          if (!response.ok) {
+            const data = await response.json();
+            throw new Error(
+              data.message || "An error occurred. Please try again."
+            );
+          }
+
+          const data = await response.json();
+          setStore({ user: data.user });
+          return data;
+        } catch (error) {
+          console.log("Error during signup:", error);
+          throw error;
+        }
       },
     },
   };

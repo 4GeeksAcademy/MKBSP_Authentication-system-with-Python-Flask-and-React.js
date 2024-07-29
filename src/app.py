@@ -1,6 +1,3 @@
-"""
-This module takes care of starting the API Server, Loading the DB and Adding the endpoints
-"""
 import os
 from flask import Flask, request, jsonify
 from flask_migrate import Migrate
@@ -10,9 +7,11 @@ from api.models import db, User
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
+from flask_cors import CORS
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
+CORS(app, resources={r"/*": {"origins": "*"}})  # This will enable CORS for all routes
 
 # Database configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:////tmp/test.db')
@@ -21,6 +20,16 @@ app.config["JWT_SECRET_KEY"] = "super-secret-key"  # Change this in production
 db.init_app(app)
 Migrate(app, db)
 jwt = JWTManager(app)
+
+# New Test Route
+@app.route('/api/test', methods=['GET'])
+def test_route():
+    return jsonify({"message": "hello there 123"}), 200
+
+@app.route('/api/hello', methods=['GET'])
+def hello():
+    return jsonify({"message": "Hello, this is your Flask backend!"}), 200
+
 
 # Error handling
 @app.errorhandler(APIException)

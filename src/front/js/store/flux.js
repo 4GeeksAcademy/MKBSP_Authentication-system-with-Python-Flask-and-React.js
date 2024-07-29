@@ -29,9 +29,7 @@ const getState = ({ getStore, getActions, setStore }) => {
       },
       getMessage: async () => {
         try {
-          const resp = await fetch(
-            process.env.REACT_APP_BACKEND_URL + "/api/hello"
-          );
+          const resp = await fetch(process.env.BACKEND_URL + "/api/hello");
           if (!resp.ok) {
             throw new Error("Network response was not ok.");
           }
@@ -54,7 +52,7 @@ const getState = ({ getStore, getActions, setStore }) => {
       signup: async (email, username, password) => {
         try {
           const response = await fetch(
-            `${process.env.REACT_APP_BACKEND_URL}/api/signup`,
+            `${process.env.BACKEND_URL}/api/signup`,
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -74,6 +72,30 @@ const getState = ({ getStore, getActions, setStore }) => {
           return data;
         } catch (error) {
           console.log("Error during signup:", error);
+          throw error;
+        }
+      },
+      login: async (email, password) => {
+        try {
+          const response = await fetch(`${process.env.BACKEND_URL}/api/token`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+          });
+
+          if (!response.ok) {
+            const data = await response.json();
+            throw new Error(
+              data.message || "An error occurred. Please try again."
+            );
+          }
+
+          const data = await response.json();
+          setStore({ token: data.token });
+          localStorage.setItem("token", data.token);
+          return data;
+        } catch (error) {
+          console.log("Error during login:", error);
           throw error;
         }
       },

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export const Signup = () => {
   const [email, setEmail] = useState("");
@@ -8,10 +8,10 @@ export const Signup = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const navigate = useNavigate();
 
   const handleSignup = async (e) => {
     console.log("Backend URL:", process.env.BACKEND_URL);
-
     e.preventDefault();
     setError("");
     setSuccess("");
@@ -22,14 +22,11 @@ export const Signup = () => {
     }
 
     try {
-      const response = await fetch(
-        `${process.env.BACKEND_URL}/api/signup`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, username, password }),
-        }
-      );
+      const response = await fetch(`${process.env.BACKEND_URL}/api/signup`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, username, password }),
+      });
 
       if (!response.ok) {
         const data = await response.json();
@@ -37,8 +34,8 @@ export const Signup = () => {
         return;
       }
 
-      setSuccess("Signup successful! Please login.");
-      setTimeout(() => (window.location.href = "/login"), 2000);
+      setSuccess("Signup successful! Redirecting to home...");
+      setTimeout(() => navigate("/"), 2000);
     } catch (error) {
       console.error("Error:", error);
       setError("An error occurred. Please try again.");
@@ -107,6 +104,9 @@ export const Signup = () => {
           Signup
         </button>
       </form>
+      <div className="text-center mt-2">
+        <Link to="/signup">Create Account</Link>
+      </div>
       <div className="text-center mt-2">
         <Link to="/login">Back to Login</Link>
       </div>

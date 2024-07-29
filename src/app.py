@@ -11,12 +11,15 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
-CORS(app, resources={r"/*": {"origins": "*"}})  # This will enable CORS for all routes
+
+# Add this line to enable CORS for all routes
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Database configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:////tmp/test.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config["JWT_SECRET_KEY"] = "super-secret-key"  # Change this in production
+app.config["JWT_SECRET_KEY"] = os.getenv('FLASK_APP_KEY', 'super-secret-key')
+
 db.init_app(app)
 Migrate(app, db)
 jwt = JWTManager(app)
@@ -29,7 +32,6 @@ def test_route():
 @app.route('/api/hello', methods=['GET'])
 def hello():
     return jsonify({"message": "Hello, this is your Flask backend!"}), 200
-
 
 # Error handling
 @app.errorhandler(APIException)

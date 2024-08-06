@@ -1,3 +1,5 @@
+// src/front/js/pages/signup.js
+
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -11,7 +13,6 @@ export const Signup = () => {
   const navigate = useNavigate();
 
   const handleSignup = async (e) => {
-    console.log("Backend URL:", process.env.BACKEND_URL);
     e.preventDefault();
     setError("");
     setSuccess("");
@@ -34,8 +35,8 @@ export const Signup = () => {
         return;
       }
 
-      setSuccess("Signup successful! Redirecting to home...");
-      setTimeout(() => navigate("/"), 2000);
+      setSuccess("Signup successful! Redirecting to login...");
+      setTimeout(() => navigate("/login"), 2000); // Redirect to login after signup
     } catch (error) {
       console.error("Error:", error);
       setError("An error occurred. Please try again.");
@@ -104,9 +105,6 @@ export const Signup = () => {
           Signup
         </button>
       </form>
-      <div className="text-center mt-2">
-        <Link to="/signup">Create Account</Link>
-      </div>
       <div className="text-center mt-2">
         <Link to="/login">Back to Login</Link>
       </div>

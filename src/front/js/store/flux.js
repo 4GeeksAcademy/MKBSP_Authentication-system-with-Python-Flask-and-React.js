@@ -1,3 +1,5 @@
+// src/front/js/store/flux.js
+
 const getState = ({ getStore, getActions, setStore }) => {
   return {
     store: {
@@ -15,39 +17,45 @@ const getState = ({ getStore, getActions, setStore }) => {
         },
       ],
       user: null,
-      token: null,
+      token: localStorage.getItem("token") || null, // Initialize from localStorage
     },
     actions: {
-      setUser: (user) => {
-        setStore({ user });
-      },
+      setUser: (user) => setStore({ user }),
       setToken: (token) => {
         setStore({ token });
-      },
-      exampleFunction: () => {
-        getActions().changeColor(0, "green");
-      },
-      getMessage: async () => {
-        try {
-          const resp = await fetch(process.env.BACKEND_URL + "/api/hello");
-          if (!resp.ok) {
-            throw new Error("Network response was not ok.");
-          }
-          const data = await resp.json();
-          setStore({ message: data.message });
-          return data;
-        } catch (error) {
-          console.log("Error loading message from backend", error);
-          return null; // or throw error if you want to propagate it
+        if (token) {
+          localStorage.setItem("token", token);
+        } else {
+          localStorage.removeItem("token");
         }
       },
-      changeColor: (index, color) => {
-        const store = getStore();
-        const demo = store.demo.map((elm, i) => {
-          if (i === index) elm.background = color;
-          return elm;
-        });
-        setStore({ demo: demo });
+      logout: () => {
+        setStore({ token: null, user: null });
+        localStorage.removeItem("token");
+      },
+      login: async (email, password) => {
+        try {
+          const response = await fetch(`${process.env.BACKEND_URL}/api/token`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+          });
+
+          if (!response.ok) {
+            const data = await response.json();
+            throw new Error(
+              data.message || "An error occurred. Please try again."
+            );
+          }
+
+          const data = await response.json();
+          setStore({ token: data.token });
+          localStorage.setItem("token", data.token);
+          return data;
+        } catch (error) {
+          console.log("Error during login:", error);
+          throw error;
+        }
       },
       signup: async (email, username, password) => {
         try {
@@ -75,30 +83,21 @@ const getState = ({ getStore, getActions, setStore }) => {
           throw error;
         }
       },
-      login: async (email, password) => {
+      getMessage: async () => {
         try {
-          const response = await fetch(`${process.env.BACKEND_URL}/api/token`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password }),
-          });
-
-          if (!response.ok) {
-            const data = await response.json();
-            throw new Error(
-              data.message || "An error occurred. Please try again."
-            );
+          const resp = await fetch(`${process.env.BACKEND_URL}/api/hello`);
+          if (!resp.ok) {
+            throw new Error("Network response was not ok.");
           }
-
-          const data = await response.json();
-          setStore({ token: data.token });
-          localStorage.setItem("token", data.token);
+          const data = await resp.json();
+          setStore({ message: data.message });
           return data;
         } catch (error) {
-          console.log("Error during login:", error);
-          throw error;
+          console.log("Error loading message from backend", error);
+          return null; // or throw error if you want to propagate it
         }
       },
+      // Add more actions here
     },
   };
 };

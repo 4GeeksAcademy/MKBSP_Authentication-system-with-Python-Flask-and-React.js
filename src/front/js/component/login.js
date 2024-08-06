@@ -1,10 +1,12 @@
+// src/front/js/component/login.js
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-export const Login = () => {
+export const Login = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -18,17 +20,16 @@ export const Login = () => {
       });
 
       if (!response.ok) {
-        const data = await response.json();
-        setError(data.message || "An error occurred. Please try again.");
-        return;
+        throw new Error("Invalid login");
       }
 
       const data = await response.json();
-      localStorage.setItem("token", data.token);
-      window.location.href = "/home"; // Redirect to the home page
+      localStorage.setItem("token", data.token); // Store token
+      onLoginSuccess(); // Use the provided function to update authentication state
+      navigate("/"); // Redirect to home page after login
     } catch (error) {
-      console.error("Error:", error);
-      setError("An error occurred. Please try again.");
+      console.error("Login failed:", error);
+      setError("Invalid credentials. Please try again.");
     }
   };
 

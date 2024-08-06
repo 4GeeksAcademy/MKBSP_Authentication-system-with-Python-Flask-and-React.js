@@ -1,0 +1,3 @@
+1) fix the navbar so that when there is a token show logout
+2) store backend token with the user session
+3) then verify against the backend token 

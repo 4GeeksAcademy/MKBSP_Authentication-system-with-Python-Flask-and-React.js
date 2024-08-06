@@ -1,12 +1,16 @@
+// src/front/js/component/navbar.js
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { Login } from "./login";
+import { Link, useNavigate } from "react-router-dom";
+import { Login } from "./login"; // Import the Login component
 
-export const Navbar = () => {
+export const Navbar = ({ isAuthenticated, onLogout, onLoginSuccess }) => {
   const [showDropdown, setShowDropdown] = useState(false);
+  const navigate = useNavigate();
 
-  const handleLoginSuccess = () => {
-    setShowDropdown(false); // Close the dropdown on successful login
+  const handleLogout = () => {
+    localStorage.removeItem("token"); // Remove token from localStorage
+    onLogout(); // Update the authentication state
+    navigate("/"); // Redirect to home page
   };
 
   return (
@@ -19,27 +23,34 @@ export const Navbar = () => {
           <Link to="/private">
             <button className="btn btn-primary">Private</button>
           </Link>
-          <div
-            className="dropdown"
-            style={{ display: "inline-block", marginLeft: "10px" }}
-          >
-            <button
-              className="btn btn-secondary dropdown-toggle"
-              type="button"
-              id="dropdownMenuButton"
-              aria-expanded={showDropdown ? "true" : "false"}
-              style={{ width: "200px" }}
-              onClick={() => setShowDropdown(!showDropdown)}
-            >
-              Login
+          {isAuthenticated ? (
+            <button className="btn btn-secondary ml-2" onClick={handleLogout}>
+              Logout
             </button>
+          ) : (
             <div
-              className={`dropdown-menu ${showDropdown ? "show" : ""}`}
-              aria-labelledby="dropdownMenuButton"
+              className="dropdown"
+              style={{ display: "inline-block", marginLeft: "10px" }}
             >
-              <Login onLoginSuccess={handleLoginSuccess} />
+              <button
+                className="btn btn-secondary dropdown-toggle"
+                type="button"
+                id="dropdownMenuButton"
+                aria-expanded={showDropdown ? "true" : "false"}
+                style={{ width: "200px" }}
+                onClick={() => setShowDropdown(!showDropdown)}
+              >
+                Login
+              </button>
+              <div
+                className={`dropdown-menu ${showDropdown ? "show" : ""}`}
+                aria-labelledby="dropdownMenuButton"
+                style={{ padding: "20px", width: "300px" }}
+              >
+                <Login onLoginSuccess={onLoginSuccess} />
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </nav>

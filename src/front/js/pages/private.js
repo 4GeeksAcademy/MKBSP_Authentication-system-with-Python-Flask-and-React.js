@@ -1,29 +1,51 @@
-import React, { useContext, useEffect } from "react";
+// src/front/js/pages/private.js
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Context } from "../store/appContext";
 
-export const Private = () => {
-  const { store } = useContext(Context);
+export const Private = ({ isAuthenticated }) => {
+  const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!store.token) {
-      navigate("/error");
-    }
-  }, [store.token, navigate]);
+    const token = localStorage.getItem("token");
 
-  return store.token ? (
+    if (!token) {
+      navigate("/error"); // Redirect to error if no token
+    } else {
+      // Verify the token with the backend
+      fetch(`${process.env.BACKEND_URL}/api/protected`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Token verification failed");
+          }
+          return response.json();
+        })
+        .then((data) => setUser(data))
+        .catch((error) => {
+          console.error("Error:", error);
+          navigate("/error");
+        });
+    }
+  }, [navigate]);
+
+  if (!isAuthenticated) {
+    return (
+      <div className="container mt-5">You must log in to view this page.</div>
+    );
+  }
+
+  return user ? (
     <div className="container mt-5">
-      <h1>Welcome to the private page, {store.user.email}!</h1>
-      <div className="embed-responsive embed-responsive-16by9">
-        <iframe
-          className="embed-responsive-item"
-          src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-          allowFullScreen
-          title="YouTube Video"
-          style={{ width: "100%", height: "500px" }}
-        ></iframe>
-      </div>
+      <h1>Welcome, {user.username}!</h1>
+      <p>You have access to this private content.</p>
     </div>
-  ) : null;
+  ) : (
+    <div>Loading...</div>
+  );
 };

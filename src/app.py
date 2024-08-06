@@ -57,7 +57,7 @@ def signup():
     db.session.commit()
     return jsonify({"message": "User created successfully"}), 201
 
-# User Login Route
+# User Login Route => move all routes to routes.py
 @app.route('/api/token', methods=['POST'])
 def create_token():
     data = request.get_json()
@@ -71,12 +71,17 @@ def create_token():
     access_token = create_access_token(identity=user.id)
     return jsonify({"token": access_token}), 200
 
-# Protected Route
+
+
+
+# secured login
 @app.route('/api/protected', methods=['GET'])
 @jwt_required()
 def protected():
     current_user_id = get_jwt_identity()
     user = User.query.get(current_user_id)
+    if not user:
+        return jsonify({"message": "User not found"}), 404
     return jsonify({"id": user.id, "username": user.username}), 200
 
 # Blueprints
@@ -88,6 +93,7 @@ setup_commands(app)
 @app.route('/')
 def sitemap():
     return generate_sitemap(app)
+
 
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3001))
